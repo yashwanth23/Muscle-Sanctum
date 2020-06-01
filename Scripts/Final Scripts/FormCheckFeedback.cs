@@ -102,7 +102,7 @@ public class FormCheckFeedback : MonoBehaviour
         
         //LeftText.text = "SHOULDER:  " + lsAngle.ToString() + "\n" + "ELBOW:  " + leAngle.ToString();
         //RightText.text = "SHOULDER:  " + rsAngle.ToString() + "\n" + "ELBOW:  " + reAngle.ToString();
-        //Debug.Log(new Vector2(lAngle, rAngle));
+        //Debug.Log(new Vector2(lsAngle, rsAngle));
     }
 
     //To check for feedback in Bicep curl we only need the angles made by Left shoulder and Right shoulder as their form is important during this exercise
@@ -135,6 +135,14 @@ public class FormCheckFeedback : MonoBehaviour
             
             if (errorPlayed && !correctPlayed && CorrectCounter > 25)
             {
+                //When the body form is corrected
+                // 1. Play correct sound 
+                // 2. Activate breathing visuals
+                // 3. Change the animation state of the trainer to performing exercise animation
+                // 4. Make errorPlayed false so as to look for errors again 
+                // 5. Instantiate Correction Particle effect 
+                // 6. Deactivate the feedback stream cubes
+
                 errorPlayed = false;
                 //Play Correct sound
                 PlayCorrectSound();
@@ -149,28 +157,26 @@ public class FormCheckFeedback : MonoBehaviour
                 leftCube.SetActive(false);
                 rightCube.SetActive(false);
             }
-            //prevCircleSize = 0;
-            //errorModule.startSize = 0f;
+
             StopErrorVideo();
             ErrorCounter = 0;
 
             errorDetected = false;
         }
 
+        //Destroy dead particle effects for efficiency
         if (correctPlayed && !CorrectPoseAura.isPlaying)
         {
             Destroy(CorrectPoseAura);
         }
 
+        //To check if the error was made on the right hand or left hand and provide feedback animation to the corresponding side
         if(errorPlayed && !errorDetected)
         {
             if (ls > 135)
             {
-                //circleSize = (ls - 135) / 15;
-                //errorModule.startSize = Mathf.Lerp(circleSize, prevCircleSize, Time.deltaTime);
                 //Play the video on Canvas UI
                 StartCoroutine(PlayErrorVideo(l_outer, 0));
-                //prevCircleSize = errorModule.startSize.constant;
             }
             else if (ls < 115)
             {
@@ -179,11 +185,8 @@ public class FormCheckFeedback : MonoBehaviour
             }
             else if (rs > 135)
             {
-                //circleSize = (ls - 135) / 15;
-                //errorModule.startSize = Mathf.Lerp(circleSize, prevCircleSize, Time.deltaTime);
                 //Play the video on Canvas UI
                 StartCoroutine(PlayErrorVideo(r_outer, 1));
-                //prevCircleSize = errorModule.startSize.constant;
             }
             else if (rs < 115)
             {
@@ -195,6 +198,8 @@ public class FormCheckFeedback : MonoBehaviour
         
     }
 
+    //This is feedback for Arnold Press exercise
+    //This code is under development
     private void ArnoldPressFeedback(float ls, float rs, float le, float re)
     {
         Debug.Log(new Vector2(ls, rs));
@@ -231,15 +236,11 @@ public class FormCheckFeedback : MonoBehaviour
 
         if (side == 0)
         {
-            //rawImage_left.enabled = true;
-            //rawImage_left.texture = videoPlayer.texture;
             leftCube.SetActive(true);
             videoPlayer.targetMaterialRenderer = leftCube.GetComponent<MeshRenderer>();
         }
         else if (side == 1)
         {
-            //rawImage_right.enabled = true;
-            //rawImage_right.texture = videoPlayer.texture;
             rightCube.SetActive(true);
             videoPlayer.targetMaterialRenderer = rightCube.GetComponent<MeshRenderer>();
         }
@@ -251,8 +252,6 @@ public class FormCheckFeedback : MonoBehaviour
     void StopErrorVideo()
     {
         videoPlayer.Stop();
-        //rawImage_left.enabled = false;
-        //rawImage_right.enabled = false;
     }
 
 }
